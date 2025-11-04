@@ -27,7 +27,7 @@ sap.ui.define(
             customer: "",
             destination: "",
             foto: {
-                src: "../public/img/notFound.png",
+                src: "./public/img/notFound.png",
                 last_upload: "",
                 name: ""
             }

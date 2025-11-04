@@ -1,0 +1,94 @@
+<mvc:View xmlns:unified="sap.ui.unified"
+    xmlns:form="sap.ui.layout.form"
+    xmlns:mvc="sap.ui.core.mvc"
+    xmlns:f="sap.f"
+    xmlns:card="sap.f.cards"
+    xmlns="sap.m"
+    xmlns:ndc="sap.ndc"
+    displayBlock="true"
+    controllerName="webapp.controller.Scan">
+    <Page id="page"
+        title="{i18n>title}"
+        showHeader="false">
+        <content>
+            <FlexBox width="100%"
+                direction="Column"
+                height="100%"
+                justifyContent="Center"
+                alignItems="Center">
+                <VBox alignContent="Center"
+                    alignItems="Center"
+                    gap="1rem">
+                    <VBox >
+                        <Label design="Bold"
+                            text="{i18n>ddt}:" />
+                        <Input id="barcodeScannerInput"
+                            type="Text"
+                            change=".onBarcodeInputChange"
+                            value="{/code}"
+                            valueHelpRequest="openScannerForInput('barcodeScannerInputCallback')"
+                            valueHelpIconSrc="sap-icon://bar-code"
+                            showValueHelp="true" />
+                    </VBox>
+                </VBox>
+                <f:Card class="sapUiMediumMarginTop"
+                    visible="true"
+                    headerPosition="Top">
+                    <f:header>
+                        <card:Header iconSrc="sap-icon://shipping-status"
+                            title="{i18n>consegna}: {/form/ddt}"
+                            iconBackgroundColor="Accent6"
+                            statusText="{i18n>data}: {/form/date}" />
+                    </f:header>
+                    <f:content>
+                        <FlexBox width="100%"
+                            direction="Row"
+                            height="100%"
+                            justifyContent="Center"
+                            alignItems="Start">
+                            <VBox justifyContent="SpaceBetween"
+                                class="sapUiSmallMargin">
+                                <VBox alignContent="SpaceBetween"
+                                    alignItems="Start">
+                                    <VBox class="sapUiSmallMarginBottom">
+                                        <Label class="sapUiTinyMarginEnd"
+                                            design="Bold"
+                                            text="{i18n>cliente}:" />
+                                        <Text text="{/form/customer}" />
+                                    </VBox>
+                                    <VBox class="sapUiSmallMarginBottom">
+                                        <Label class="sapUiTinyMarginEnd"
+                                            design="Bold"
+                                            text="{i18n>destinazione}:" />
+                                        <Text text="{/form/destination}" />
+                                    </VBox>
+                                </VBox>
+                                <Image src="{/form/foto/src}"
+                                    width="20rem"
+                                    height="auto"
+                                    class="sapUiSmallMargin">
+                                    <detailBox>
+                                        <LightBox>
+                                            <LightBoxItem imageSrc="{/form/foto/src}"
+                                                alt="Beamer"
+                                                title="{/form/foto/name}"
+                                                subtitle="{i18n>lastUpload}: {/form/foto/last_upload}" />
+                                        </LightBox>
+                                    </detailBox>
+                                </Image>
+                                <VBox>
+                                    <Label design="Bold"
+                                        text="{i18n>foto}:" />
+                                    <unified:FileUploader width="100%"
+                                        value="{/form/foto/name}"
+                                        buttonText="{i18n>sostituisci}"
+                                        style="Emphasized" />
+                                </VBox>
+                            </VBox>
+                        </FlexBox>
+                    </f:content>
+                </f:Card>
+            </FlexBox>
+        </content>
+    </Page>
+</mvc:View>

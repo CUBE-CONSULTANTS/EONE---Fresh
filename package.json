@@ -22,7 +22,7 @@
     },
     "scripts": {
         "start": "fiori run --accept-remote-connections --open index.html",
-        "build": "ui5 build --config=ui5.yaml --clean-dest --dest ../dist/webapp",
+        "build": "ui5 build --config=ui5.yaml --clean-dest --dest ./dist",
         "ui5lint": "ui5lint",
         "lint": "eslint ./",
         "qunit": "fiori run --open test/unitTests.qunit.html",

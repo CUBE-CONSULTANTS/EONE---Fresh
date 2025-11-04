@@ -1,49 +1,48 @@
-name: Build and Deploy SAPUI5 to gh-pages
+name: Build and Deploy to GitHub Pages
+
 on:
   push:
-    branches: [ main ]
+    branches:
+      - main
+  workflow_dispatch:
 
 permissions:
-  contents: read
+  contents: write
   pages: write
   id-token: write
 
-concurrency:
-  group: "pages"
-  cancel-in-progress: false
-
 jobs:
-  build-deploy:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Build webapp
+        working-directory: ./webapp
+        run: npm run build
+
+      - name: Upload artifact for deployment
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: ./webapp/dist
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
-    runs-on: ubuntu-latest
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-          
-      - name: Setup Node
-        uses: actions/setup-node@v4
-        with:
-          node-version: '22'
-  
-      - name: Install deps
-        working-directory: ./
-        run: npm install
-  
-      - name: Build UI5
-        working-directory: ./
-        run: npm run build
-     
-      - name: Prepare SPA fallback (optional)
-        run: |
-          if [ -f ./index.html ]; then cp ./index.html ./404.html || true; fi
-          
-      - name: Upload artifact
-        uses: actions/upload-pages-artifact@v3
-        with:
-          path: ./
-          
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4

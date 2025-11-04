@@ -29,7 +29,7 @@ jobs:
   
       - name: Install deps
         working-directory: ./
-        run: npm ci
+        run: npm install
   
       - name: Build UI5
         working-directory: ./

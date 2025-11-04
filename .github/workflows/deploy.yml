@@ -33,7 +33,7 @@ jobs:
       - name: Upload artifact for deployment
         uses: actions/upload-pages-artifact@v3
         with:
-          path: ./webapp/dist
+          path: ./dist
 
   deploy:
     needs: build

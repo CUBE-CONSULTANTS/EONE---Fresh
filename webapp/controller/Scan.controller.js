@@ -46,6 +46,7 @@ sap.ui.define(
           console.log(this.getModel("deliverySet").getData());
         } catch (error) {
           MessageBox.error("Errore nel recupero dei dati dal servizio OData.");
+          this.hideBusy(0);
         } finally {
           this.hideBusy(0);
         }

@@ -113,7 +113,7 @@ sap.ui.define(
         });
       },
       _processDelivery: function (sCode) {
-        debugger
+        debugger;
         const oScanModel = this.getView().getModel("scanModel");
 
         return this._checkDeliveryExists(sCode)
@@ -122,10 +122,15 @@ sap.ui.define(
               oScanModel.setProperty("/form/ddt", oDelivery.Deliverydocument);
               oScanModel.setProperty("/form/date", oDelivery.Documentdate);
               oScanModel.setProperty("/form/customer", oDelivery.Customername);
-              oScanModel.setProperty(
-                "/form/destination",
-                oDelivery.Destination || ""
-              );
+              const sDestinationParts = [
+                oDelivery.Streetname,
+                oDelivery.Postalcode,
+                oDelivery.Cityname,
+                oDelivery.Country,
+              ].filter(Boolean);
+              const sDestination = sDestinationParts.join(", ");
+              oScanModel.setProperty("/form/destination", sDestination);
+
               oScanModel.setProperty(
                 "/form/foto",
                 oDelivery.Foto || {
@@ -148,8 +153,8 @@ sap.ui.define(
           this.getOwnerComponent().getModel("ZCMRTODDT_SRV"),
           "/ZV_DDTSet",
           { Mandt: "", Deliverydocument: sDeliveryCode },
-          [], 
-          ["NavToDdt"] 
+          [],
+          ["NavToDdt"]
         )
           .then((oDelivery) => oDelivery || null)
           .catch((err) => {

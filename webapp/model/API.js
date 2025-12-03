@@ -175,28 +175,28 @@ sap.ui.define(
             headers: { Accept: "*/*" },
           });
 
-          if (!response.ok)
+          if (!response.ok) {
             throw new Error(`Errore download allegato: ${response.status}`);
+          }
 
           const blob = await response.blob();
-          const base64 = await new Promise((resolve) => {
+          const base64 = await new Promise((resolve, reject) => {
             const reader = new FileReader();
             reader.onloadend = () => resolve(reader.result);
+            reader.onerror = reject;
             reader.readAsDataURL(blob);
           });
 
           return {
-            src: base64,
-            name: safeFilename,
-            last_upload: "", // qui puoi aggiungere logica se vuoi leggere la data da un altro endpoint
-          };
-        } catch (err) {
-          console.error("Errore caricamento allegato:", err);
-          return {
-            src: "./public/img/notFound.png",
+            src: base64, 
             name: safeFilename,
             last_upload: "",
           };
+        } catch (err) {
+          console.error("Errore caricamento allegato:", err);
+          throw new Error(
+            `Errore caricamento allegato ${safeFilename}: ${err.message}`
+          );
         }
       },
 

@@ -169,8 +169,7 @@ sap.ui.define(
 
         const safeFilename = oAttachment.Filename.split(/[/\\]/).pop();
         const oModel = this.getOwnerComponent().getModel("ZCMRTODDT_SRV");
-        try {
-        const src = await API.readAttachment(
+        const oFoto = await API.readAttachment(
           oModel,
           "",
           oDelivery.Deliverydocument,
@@ -178,14 +177,10 @@ sap.ui.define(
         );
 
         return {
-          src: src,
+          src: oFoto.src, 
           last_upload: "",
-          name: safeFilename,
+          name: oFoto.name,
         };
-        } catch (error) {
-          console.error("Errore durante il caricamento della foto:", error);
-          throw error; 
-        }
       },
       openScannerForInput() {
         BarcodeScanner.scan(

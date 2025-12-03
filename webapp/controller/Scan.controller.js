@@ -1,21 +1,27 @@
 sap.ui.define(
-  ["./BaseController", "../model/models", "sap/ndc/BarcodeScanner"],
+  ["./BaseController", "../model/models", "sap/ndc/BarcodeScanner", "../model/API","sap/m/MessageBox","sap/ui/model/json/JSONModel",],
   /**
    * @param {typeof sap.ui.core.mvc.Controller} Controller
    */
-  function (BaseController, models, BarcodeScanner) {
+  function (BaseController, models, BarcodeScanner, API,MessageBox, JSONModel) {
     "use strict";
 
     return BaseController.extend("webapp.controller.Scan", {
       onInit: function () {
-        this.getRouter()
-          .getRoute("Scan")
-          .attachMatched(this._onObjectMatched, this);
-
+        this.getRouter().getRoute("Scan").attachMatched(this._onObjectMatched, this);
         this.getView().setModel(models.createScanModel());
       },
 
-      _onObjectMatched(oEvent) {},
+      async _onObjectMatched(oEvent)  {
+        const oModel = this.getOwnerComponent().getModel("ZCMRTODDT_SRV");
+        try {
+          const deliverySet = await API.getEntity(oModel, "/ZV_DDTSet", [], [], {})
+          this.setModel(new JSONModel(deliverySet.results), "deliverySet");
+          console.log(this.getModel("deliverySet").getData());
+        } catch (error) {
+          MessageBox.error("Errore nel recupero dei dati dal servizio OData.");
+        }
+      },
 
       onBarcodeInputChange(e) {
         const { value: code } = e.getParameters();

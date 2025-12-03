@@ -52,6 +52,34 @@ sap.ui.define(
         this.getView().setModel(oModel, sName);
         return this;
       },
+      showBusy: function (delay) {
+        // sap.ui.core.BusyIndicator.show(delay || 0);
+        sap.ui.core.BusyIndicator.show(delay);
+      },
+      hideBusy: function (delay) {
+        // sap.ui.core.BusyIndicator.hide(delay || 0);
+        sap.ui.core.BusyIndicator.hide(delay);
+      },
+      onOpenDialog: function (dialName, fragmName, self, ...oModel) {
+        let oView = self.getView();
+        if (!self[dialName]) {
+          Fragment.load({
+            id: oView.getId(),
+            name: fragmName,
+            controller: self,
+          }).then((oDialog) => {
+            oView.addDependent(oDialog);
+            oDialog.setModel(self.getModel(...oModel));
+            self[dialName] = oDialog;
+            oDialog.open();
+          });
+        } else {
+          self[dialName].open();
+        }
+      },
+      onClose: function (oEvent) {
+        oEvent.getSource().getParent().close();
+      },
     });
   }
 );

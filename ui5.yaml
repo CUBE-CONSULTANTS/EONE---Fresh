@@ -8,6 +8,9 @@ server:
       afterMiddleware: compression
       configuration:
         ignoreCertError: false
+        backend:
+          - path: /sap/opu/odata/sap/zcmrtoddt_srv
+            url: https://sap.freshtropical.it
         ui5:
           path:
             - /resources

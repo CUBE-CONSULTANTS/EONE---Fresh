@@ -17,7 +17,15 @@ sap.ui.define(
         oModel.setDefaultBindingMode("OneWay");
         return oModel;
       },
-
+      createMainModel: function () {
+				return new JSONModel({
+					visibility: false,
+					editable: false,
+					enabled: false,
+					busy: false,
+					selected: false
+				});
+			},
       createScanModel() {
         return new JSONModel({
           code: "",

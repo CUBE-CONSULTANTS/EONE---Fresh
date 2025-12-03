@@ -113,7 +113,7 @@
                     <Input
                         id="barcodeScannerInput"
                         type="Text"
-                        value="{/code}"
+                        value="{scanModel>/code}"
                         change=".onBarcodeInputChange"
                         valueHelpRequest="openScannerForInput('barcodeScannerInputCallback')"
                         valueHelpIconSrc="sap-icon://bar-code"
@@ -148,9 +148,9 @@
                     <f:header>
                         <card:Header
                             iconSrc="sap-icon://shipping-status"
-                            title="{i18n>consegna}: {/form/ddt}"
+                            title="{i18n>consegna}: {scanModel>/form/ddt}"
                             iconBackgroundColor="Accent6"
-                            statusText="{i18n>data}: {/form/date}"
+                            statusText="{i18n>data}: {scanModel>/form/date}"
                         />
                     </f:header>
                     <f:content>
@@ -165,7 +165,7 @@
                                 text="{i18n>cliente}:"
                             />
                             <Text
-                                text="{/form/customer}"
+                                text="{scanModel>/form/customer}"
                                 class="sapUiSmallMarginBottom"
                             />
 
@@ -174,12 +174,12 @@
                                 text="{i18n>destinazione}:"
                             />
                             <Text
-                                text="{/form/destination}"
+                                text="{scanModel>/form/destination}"
                                 class="sapUiSmallMarginBottom"
                             />
 
                             <Image
-                                src="{/form/foto/src}"
+                                src="{scanModel>/form/foto/src}"
                                 width="100%"
                                 height="auto"
                                 class="sapUiMediumMarginBottom"
@@ -187,10 +187,10 @@
                                 <detailBox>
                                     <LightBox>
                                         <LightBoxItem
-                                            imageSrc="{/form/foto/src}"
-                                            alt="{/form/foto/name}"
-                                            title="{/form/foto/name}"
-                                            subtitle="{i18n>lastUpload}: {/form/foto/last_upload}"
+                                            imageSrc="{scanModel>/form/foto/src}"
+                                            alt="{scanModel>/form/foto/name}"
+                                            title="{scanModel>/form/foto/name}"
+                                            subtitle="{i18n>lastUpload}: {scanModel>/form/foto/last_upload}"
                                         />
                                     </LightBox>
                                 </detailBox>
@@ -202,7 +202,7 @@
                             />
                             <unified:FileUploader
                                 width="100%"
-                                value="{/form/foto/name}"
+                                value="{scanModel>/form/foto/name}"
                                 buttonText="{i18n>sostituisci}"
                                 style="Emphasized"
                             />

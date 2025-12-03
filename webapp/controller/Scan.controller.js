@@ -28,11 +28,12 @@ sap.ui.define(
         this.getRouter()
           .getRoute("Scan")
           .attachMatched(this._onObjectMatched, this);
-        this.getView().setModel(models.createScanModel());
+        this.setModel(models.createScanModel(), "scanModel");
       },
 
       async _onObjectMatched(oEvent) {
         const oModel = this.getOwnerComponent().getModel("ZCMRTODDT_SRV");
+        this.showBusy(0);
         try {
           const deliverySet = await API.getEntity(
             oModel,
@@ -45,6 +46,8 @@ sap.ui.define(
           console.log(this.getModel("deliverySet").getData());
         } catch (error) {
           MessageBox.error("Errore nel recupero dei dati dal servizio OData.");
+        } finally {
+          this.hideBusy(0);
         }
       },
       onManualSearch: function () {
@@ -57,41 +60,104 @@ sap.ui.define(
         );
       },
       onDdtSelect: function (oEvent) {
-        debugger;
-        const oSelectedItem =
-          oEvent.getParameter("listItem") ||
-          oEvent.getParameter("selectedItem");
-        if (!oSelectedItem) return;
-        const oContext = oSelectedItem.getBindingContext("deliverySet");
+        const sDeliveryCode = oEvent
+          .getParameters()
+          .listItem.getBindingContext("deliverySet")
+          .getProperty("Deliverydocument");
+
+        if (!sDeliveryCode) return;
+
+        const oScanModel = this.getModel("scanModel");
+        oScanModel.setProperty("/code", sDeliveryCode);
         oEvent.getSource().getParent().close();
+        this._processDelivery(sDeliveryCode);
       },
-      onBarcodeInputChange(e) {
-        debugger;
-        const { value: code } = e.getParameters();
+      // onBarcodeInputChange: function (e) {
+      //   const sCode = e.getParameter("value") || "";
+      //   const oScanModel = this.getModel("scanModel");
+      //   oScanModel.setProperty("/code", sCode);
+      //   if (sCode) {
+      //     oScanModel.setProperty("/form/ddt", "12345678");
+      //     oScanModel.setProperty("/form/date", "25/03/2025");
+      //     oScanModel.setProperty("/form/customer", "Mario Rossi");
+      //     oScanModel.setProperty(
+      //       "/form/destination",
+      //       "Via Verdi 4, 42123, Reggio Emilia ( RE )"
+      //     );
+      //     oScanModel.setProperty("/form/foto", {
+      //       src: "https://img.freepik.com/free-vector/hand-drawn-delivery-note-template_23-2149890119.jpg",
+      //       last_upload: "21/05/2025",
+      //       name: "delivery.jpg",
+      //     });
+      //   }
 
-        this.getModel().setData({
-          code: code || "",
-          form: {
-            ddt: "12345678",
-            date: "25/03/2025",
-            customer: "Mario Rossi",
-            destination: "Via Verdi 4, 42123, Reggio Emilia ( RE )",
-            foto: {
-              src: "https://img.freepik.com/free-vector/hand-drawn-delivery-note-template_23-2149890119.jpg",
-              last_upload: "21/05/2025",
-              name: "delivery.jpg",
-            },
-          },
+      //   e.getSource().setEditable(false);
+
+      //   setTimeout(() => {
+      //     e.getSource().setEditable(true);
+      //     e.getSource().setValue("");
+      //   }, 500);
+      // },
+      onBarcodeInputChange: function (e) {
+        const sCode = e.getParameter("value") || "";
+        const oScanModel = this.getView().getModel("scanModel");
+        oScanModel.setProperty("/code", sCode);
+        if (!sCode) {
+          return;
+        }
+        const oInput = e.getSource();
+        oInput.setEditable(false);
+        this._processDelivery(sCode).finally(() => {
+          oInput.setEditable(true);
+          oScanModel.setProperty("/code", "");
         });
-
-        e.getSource().setEditable(false);
-
-        setTimeout(() => {
-          e.getSource().setEditable(true);
-          e.getSource().setValue("");
-        }, 500);
       },
+      _processDelivery: function (sCode) {
+        ;
+        const oScanModel = this.getView().getModel("scanModel");
 
+        return this._checkDeliveryExists(sCode)
+          .then((oDelivery) => {
+            if (oDelivery) {
+              oScanModel.setProperty("/form/ddt", oDelivery.Deliverydocument);
+              oScanModel.setProperty("/form/date", oDelivery.Documentdate);
+              oScanModel.setProperty("/form/customer", oDelivery.Customername);
+              oScanModel.setProperty(
+                "/form/destination",
+                oDelivery.Destination || ""
+              );
+              oScanModel.setProperty(
+                "/form/foto",
+                oDelivery.Foto || {
+                  src: "./public/img/notFound.png",
+                  last_upload: "",
+                  name: "",
+                }
+              );
+            } else {
+              MessageBox.error("Consegna inesistente");
+            }
+          })
+          .catch((err) => {
+            console.error(err);
+            MessageBox.error("Errore durante la verifica della consegna");
+          });
+      },
+      _checkDeliveryExists: function (sDeliveryCode) {
+        ;
+        return API.readByKey(
+          this.getOwnerComponent().getModel("ZCMRTODDT_SRV"),
+          "/ZV_DDTSet",
+          { Mandt: "", Deliverydocument: sDeliveryCode },
+          [], 
+          ["NavToDdt"] 
+        )
+          .then((oDelivery) => oDelivery || null)
+          .catch((err) => {
+            console.error(err);
+            return null;
+          });
+      },
       openScannerForInput() {
         BarcodeScanner.scan(
           (data) => {

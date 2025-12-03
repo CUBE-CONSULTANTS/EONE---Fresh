@@ -4,22 +4,29 @@ sap.ui.define(
     "use strict";
 
     return {
-      getEntity: function (oModel, Entity, aFilters = [], Expands = [],params = {}) {
-        let urlParameters = {...params};
+      getEntity: function (
+        oModel,
+        Entity,
+        aFilters = [],
+        Expands = [],
+        params = {}
+      ) {
+        let urlParameters = { ...params };
         if (urlParameters.$top === undefined) delete urlParameters.$top;
         if (urlParameters.$skip === undefined) delete urlParameters.$skip;
-        if (Expands.length > 0) {       
+        if (Expands.length > 0) {
           urlParameters.$expand = Expands.join(",");
         }
         return new Promise((resolve, reject) => {
           oModel.read(Entity, {
             filters: aFilters.length > 0 ? aFilters : undefined,
-            urlParameters: Object.keys(urlParameters).length > 0 ? urlParameters : undefined,
+            urlParameters:
+              Object.keys(urlParameters).length > 0 ? urlParameters : undefined,
             success: (odata) => {
               resolve({
                 results: odata.results || odata,
                 success: true,
-            });
+              });
             },
             error: (err) => {
               reject({ success: false, error: err });
@@ -27,7 +34,13 @@ sap.ui.define(
           });
         });
       },
-      fetchMC: function(oModel, Entity, aFilters = [], Expands = [], headers = {}){
+      fetchMC: function (
+        oModel,
+        Entity,
+        aFilters = [],
+        Expands = [],
+        headers = {}
+      ) {
         const baseUrl = oModel.sServiceUrl;
         let urlParameters = "";
         if (Expands.length > 0) {
@@ -37,9 +50,9 @@ sap.ui.define(
           if (urlParameters) urlParameters += "&";
           urlParameters += `$filter=${aFilters.join(",")}`;
         }
-      
-        const requestUrl = `${baseUrl}${Entity}?${urlParameters}`
-      
+
+        const requestUrl = `${baseUrl}${Entity}?${urlParameters}`;
+
         return new Promise((resolve, reject) => {
           fetch(requestUrl, {
             method: "GET",
@@ -48,24 +61,32 @@ sap.ui.define(
               ...headers,
             },
           })
-          .then((response) => {
-            if (!response.ok) {
-              throw new Error(`Request failed with status ${response.status}`);
-            }
-            return response.json(); 
-          })
-          .then((data) => {
-            resolve({
-              results: data.value || data, 
-              success: true,
+            .then((response) => {
+              if (!response.ok) {
+                throw new Error(
+                  `Request failed with status ${response.status}`
+                );
+              }
+              return response.json();
+            })
+            .then((data) => {
+              resolve({
+                results: data.value || data,
+                success: true,
+              });
+            })
+            .catch((error) => {
+              reject({ success: false, error: error.message });
             });
-          })
-          .catch((error) => {
-            reject({ success: false, error: error.message });
-          });
         });
       },
-      readByKey: function (oModel,Entity,keyValue,aFilters = [], Expands = []) {
+      readByKey: function (
+        oModel,
+        Entity,
+        keyValue,
+        aFilters = [],
+        Expands = []
+      ) {
         let keyString =
           typeof keyValue === "object"
             ? Object.entries(keyValue)
@@ -92,16 +113,23 @@ sap.ui.define(
         });
       },
 
-      createEntity: function (oModel, Entity, oRecords, headers = {},Expands = []) {
+      createEntity: function (
+        oModel,
+        Entity,
+        oRecords,
+        headers = {},
+        Expands = []
+      ) {
         let urlParameters = {};
-    
+
         if (Expands.length > 0) {
-            urlParameters.$expand = Expands.join(",");
+          urlParameters.$expand = Expands.join(",");
         }
         return new Promise((resolve, reject) => {
           oModel.create(Entity, oRecords, {
             headers: headers,
-            urlParameters: Object.keys(urlParameters).length > 0 ? urlParameters : undefined,
+            urlParameters:
+              Object.keys(urlParameters).length > 0 ? urlParameters : undefined,
             success: function (res) {
               resolve(res);
             },
@@ -137,13 +165,41 @@ sap.ui.define(
           });
         });
       },
-      
-      //esempio batchOP: const batchOperations = [
-      //   { path: "/Products", method: "GET" },
-      //   { path: "/Products", method: "POST", data: { ID: 1003, Name: "Smartphone", Price: 800 }},
-      //   { path: "/Products(1003)", method: "PATCH", data: { Price: 850 } },
-      //   { path: "/Products(1002)", method: "DELETE" }
-      // ];
+      readAttachment: async function (oModel, sMandt, sDelivery, sFilename) {
+        const safeFilename = sFilename.split(/[/\\]/).pop();
+        const sUrl = `${oModel.sServiceUrl}/ZAttach_DDTSet(Mandt='${sMandt}',Delivery='${sDelivery}',Filename='${safeFilename}')/$value`;
+
+        try {
+          const response = await fetch(sUrl, {
+            method: "GET",
+            headers: { Accept: "*/*" },
+          });
+
+          if (!response.ok)
+            throw new Error(`Errore download allegato: ${response.status}`);
+
+          const blob = await response.blob();
+          const base64 = await new Promise((resolve) => {
+            const reader = new FileReader();
+            reader.onloadend = () => resolve(reader.result);
+            reader.readAsDataURL(blob);
+          });
+
+          return {
+            src: base64,
+            name: safeFilename,
+            last_upload: "", // qui puoi aggiungere logica se vuoi leggere la data da un altro endpoint
+          };
+        } catch (err) {
+          console.error("Errore caricamento allegato:", err);
+          return {
+            src: "./public/img/notFound.png",
+            name: safeFilename,
+            last_upload: "",
+          };
+        }
+      },
+
       sendBatchRequest: function (oModel, batchOperations) {
         return new Promise((resolve, reject) => {
           let mRequests = [];

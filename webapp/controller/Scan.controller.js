@@ -113,41 +113,36 @@ sap.ui.define(
           oScanModel.setProperty("/code", "");
         });
       },
-      _processDelivery: function (sCode) {
-        debugger;
+      _processDelivery: async function (sCode) {
         const oScanModel = this.getView().getModel("scanModel");
+        try {
+          const oDelivery = await this._checkDeliveryExists(sCode);
 
-        return this._checkDeliveryExists(sCode)
-          .then((oDelivery) => {
-            if (oDelivery) {
-              oScanModel.setProperty("/form/ddt", oDelivery.Deliverydocument);
-              oScanModel.setProperty("/form/date", oDelivery.Documentdate);
-              oScanModel.setProperty("/form/customer", oDelivery.Customername);
-              const sDestinationParts = [
-                oDelivery.Streetname,
-                oDelivery.Postalcode,
-                oDelivery.Cityname,
-                oDelivery.Country,
-              ].filter(Boolean);
-              const sDestination = sDestinationParts.join(", ");
-              oScanModel.setProperty("/form/destination", sDestination);
+          if (!oDelivery) {
+            throw new Error("Consegna inesistente");
+          }
+          oScanModel.setProperty("/form/ddt", oDelivery.Deliverydocument);
+          oScanModel.setProperty("/form/date", oDelivery.Documentdate);
+          oScanModel.setProperty("/form/customer", oDelivery.Customername);
 
-              oScanModel.setProperty(
-                "/form/foto",
-                oDelivery.Foto || {
-                  src: "./public/img/notFound.png",
-                  last_upload: "",
-                  name: "",
-                }
-              );
-            } else {
-              MessageBox.error("Consegna inesistente");
-            }
-          })
-          .catch((err) => {
-            console.error(err);
-            MessageBox.error("Errore durante la verifica della consegna");
-          });
+          const sDestination = [
+            oDelivery.Streetname,
+            oDelivery.Postalcode,
+            oDelivery.Cityname,
+            oDelivery.Country,
+          ]
+            .filter(Boolean)
+            .join(", ");
+
+          oScanModel.setProperty("/form/destination", sDestination);
+          const oFoto = await this._loadDeliveryPhoto(oDelivery);
+          oScanModel.setProperty("/form/foto", oFoto);
+        } catch (err) {
+          console.error(err);
+          MessageBox.error(
+            err.message || "Errore durante la verifica della consegna"
+          );
+        }
       },
       _checkDeliveryExists: function (sDeliveryCode) {
         return API.readByKey(
@@ -156,12 +151,41 @@ sap.ui.define(
           { Mandt: "", Deliverydocument: sDeliveryCode },
           [],
           ["NavToDdt"]
-        )
-          .then((oDelivery) => oDelivery || null)
-          .catch((err) => {
-            console.error(err);
-            return null;
-          });
+        ).then((oDelivery) => oDelivery || null);
+      },
+      _loadDeliveryPhoto: async function (oDelivery) {
+        if (!oDelivery.NavToDdt || oDelivery.NavToDdt.results.length === 0) {
+          return {
+            src: "./public/img/notFound.png",
+            last_upload: "",
+            name: "",
+          };
+        }
+
+        const oAttachment = oDelivery.NavToDdt.results[2];
+        if (!oAttachment) {
+          throw new Error("Errore durante il caricamento della foto");
+        }
+
+        const safeFilename = oAttachment.Filename.split(/[/\\]/).pop();
+        const oModel = this.getOwnerComponent().getModel("ZCMRTODDT_SRV");
+        try {
+        const src = await API.readAttachment(
+          oModel,
+          "",
+          oDelivery.Deliverydocument,
+          safeFilename
+        );
+
+        return {
+          src: src,
+          last_upload: "",
+          name: safeFilename,
+        };
+        } catch (error) {
+          console.error("Errore durante il caricamento della foto:", error);
+          throw error; 
+        }
       },
       openScannerForInput() {
         BarcodeScanner.scan(

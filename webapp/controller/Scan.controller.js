@@ -1,29 +1,72 @@
 sap.ui.define(
-  ["./BaseController", "../model/models", "sap/ndc/BarcodeScanner", "../model/API","sap/m/MessageBox","sap/ui/model/json/JSONModel",],
+  [
+    "./BaseController",
+    "../model/models",
+    "sap/ndc/BarcodeScanner",
+    "../model/API",
+    "sap/m/MessageBox",
+    "sap/ui/model/json/JSONModel",
+    "../model/formatter",
+  ],
   /**
    * @param {typeof sap.ui.core.mvc.Controller} Controller
    */
-  function (BaseController, models, BarcodeScanner, API,MessageBox, JSONModel) {
+  function (
+    BaseController,
+    models,
+    BarcodeScanner,
+    API,
+    MessageBox,
+    JSONModel,
+    formatter
+  ) {
     "use strict";
 
     return BaseController.extend("webapp.controller.Scan", {
+      formatter: formatter,
       onInit: function () {
-        this.getRouter().getRoute("Scan").attachMatched(this._onObjectMatched, this);
+        this.getRouter()
+          .getRoute("Scan")
+          .attachMatched(this._onObjectMatched, this);
         this.getView().setModel(models.createScanModel());
       },
 
-      async _onObjectMatched(oEvent)  {
+      async _onObjectMatched(oEvent) {
         const oModel = this.getOwnerComponent().getModel("ZCMRTODDT_SRV");
         try {
-          const deliverySet = await API.getEntity(oModel, "/ZV_DDTSet", [], [], {})
+          const deliverySet = await API.getEntity(
+            oModel,
+            "/ZV_DDTSet",
+            [],
+            ["NavToDdt"],
+            {}
+          );
           this.setModel(new JSONModel(deliverySet.results), "deliverySet");
           console.log(this.getModel("deliverySet").getData());
         } catch (error) {
           MessageBox.error("Errore nel recupero dei dati dal servizio OData.");
         }
       },
-
+      onManualSearch: function () {
+        const self = this;
+        this.onOpenDialog(
+          "ddtHelpDialog",
+          "webapp.view.fragments.DdtHelp",
+          self,
+          "deliverySet"
+        );
+      },
+      onDdtSelect: function (oEvent) {
+        debugger;
+        const oSelectedItem =
+          oEvent.getParameter("listItem") ||
+          oEvent.getParameter("selectedItem");
+        if (!oSelectedItem) return;
+        const oContext = oSelectedItem.getBindingContext("deliverySet");
+        oEvent.getSource().getParent().close();
+      },
       onBarcodeInputChange(e) {
+        debugger;
         const { value: code } = e.getParameters();
 
         this.getModel().setData({

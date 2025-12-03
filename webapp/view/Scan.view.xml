@@ -1,4 +1,5 @@
-<mvc:View xmlns:unified="sap.ui.unified"
+<mvc:View
+    xmlns:unified="sap.ui.unified"
     xmlns:form="sap.ui.layout.form"
     xmlns:mvc="sap.ui.core.mvc"
     xmlns:f="sap.f"
@@ -6,12 +7,16 @@
     xmlns="sap.m"
     xmlns:ndc="sap.ndc"
     displayBlock="true"
-    controllerName="webapp.controller.Scan">
-    <Page id="page"
+    xmlns:layout="sap.ui.layout"
+    controllerName="webapp.controller.Scan"
+>
+    <Page
+        id="page"
         title="{i18n>title}"
-        showHeader="false">
+        showHeader="false"
+    >
         <content>
-            <FlexBox width="100%"
+            <!-- <FlexBox width="100%"
                 direction="Column"
                 height="100%"
                 justifyContent="Center"
@@ -28,7 +33,9 @@
                             value="{/code}"
                             valueHelpRequest="openScannerForInput('barcodeScannerInputCallback')"
                             valueHelpIconSrc="sap-icon://bar-code"
-                            showValueHelp="true" />
+                            showValueHelp="true"
+                            />
+                            
                     </VBox>
                 </VBox>
                 <f:Card class="sapUiMediumMarginTop"
@@ -86,6 +93,120 @@
                                 </VBox>
                             </VBox>
                         </FlexBox>
+                    </f:content>
+                </f:Card>
+            </FlexBox> -->
+            <FlexBox
+                direction="Column"
+                width="100%"
+                height="100%"
+                justifyContent="Start"
+                alignItems="Center"
+                class="sapUiMediumMarginTop"
+            >
+                <layout:Grid
+                    defaultSpan="L12 M12 S12"
+                    hSpacing="1"
+                    vSpacing="1"
+                    width="100%"
+                >
+                    <Input
+                        id="barcodeScannerInput"
+                        type="Text"
+                        value="{/code}"
+                        change=".onBarcodeInputChange"
+                        valueHelpRequest="openScannerForInput('barcodeScannerInputCallback')"
+                        valueHelpIconSrc="sap-icon://bar-code"
+                        showValueHelp="true"
+                        placeholder="{i18n>insertDeliveryNumber}"
+                        width="100%"
+                    >
+                        <layoutData>
+                            <layout:GridData span="L10 M9 S12" />
+                        </layoutData>
+                    </Input>
+
+                    <Button
+                        icon="sap-icon://search"
+                        press=".onManualSearch"
+                        width="100%"
+                        type="Emphasized"
+                        tooltip="{i18n>search}"
+                    >
+                        <layoutData>
+                            <layout:GridData span="L2 M3 S12" />
+                        </layoutData>
+                    </Button>
+                </layout:Grid>
+
+                <!-- Card con dati consegna -->
+                <f:Card
+                    class="sapUiMediumMarginTop"
+                    width="100%"
+                    headerPosition="Top"
+                >
+                    <f:header>
+                        <card:Header
+                            iconSrc="sap-icon://shipping-status"
+                            title="{i18n>consegna}: {/form/ddt}"
+                            iconBackgroundColor="Accent6"
+                            statusText="{i18n>data}: {/form/date}"
+                        />
+                    </f:header>
+                    <f:content>
+                        <VBox
+                            width="100%"
+                            class="sapUiMediumMargin"
+                            justifyContent="Start"
+                            alignItems="Stretch"
+                        >
+                            <Label
+                                design="Bold"
+                                text="{i18n>cliente}:"
+                            />
+                            <Text
+                                text="{/form/customer}"
+                                class="sapUiSmallMarginBottom"
+                            />
+
+                            <Label
+                                design="Bold"
+                                text="{i18n>destinazione}:"
+                            />
+                            <Text
+                                text="{/form/destination}"
+                                class="sapUiSmallMarginBottom"
+                            />
+
+                            <Image
+                                src="{/form/foto/src}"
+                                width="100%"
+                                height="auto"
+                                class="sapUiMediumMarginBottom"
+                            >
+                                <detailBox>
+                                    <LightBox>
+                                        <LightBoxItem
+                                            imageSrc="{/form/foto/src}"
+                                            alt="{/form/foto/name}"
+                                            title="{/form/foto/name}"
+                                            subtitle="{i18n>lastUpload}: {/form/foto/last_upload}"
+                                        />
+                                    </LightBox>
+                                </detailBox>
+                            </Image>
+
+                            <Label
+                                design="Bold"
+                                text="{i18n>foto}:"
+                            />
+                            <unified:FileUploader
+                                width="100%"
+                                value="{/form/foto/name}"
+                                buttonText="{i18n>sostituisci}"
+                                style="Emphasized"
+                            />
+                        </VBox>
                     </f:content>
                 </f:Card>
             </FlexBox>

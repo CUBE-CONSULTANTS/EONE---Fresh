@@ -1,0 +1,60 @@
+<core:FragmentDefinition
+    xmlns="sap.m"
+    xmlns:core="sap.ui.core"
+>
+    <Dialog
+        id="ddtHelpDialog"
+        title="{i18n>ddtHelpTitle}"
+        class="sapUiResponsivePaddingCompact"
+        stretch="true"
+        resizable="false"
+    >
+
+        <Table
+            id="ddtTable"
+            items="{deliverySet>/}"
+            mode="SingleSelectMaster"
+            showSeparators="Inner"
+            itemPress=".onDdtSelect"
+            inset="false"
+            growing="true"
+            growingScrollToLoad="true"
+            width="100%"
+        >
+            <columns>
+                <Column>
+                    <Text text="DDT"/>
+                </Column>
+                <Column>
+                    <Text text="Cliente"/>
+                </Column>
+                <Column>
+                    <Text text="Località"/>
+                </Column>
+                <Column>
+                    <Text text="Data"/>
+                </Column>
+            </columns>
+
+            <items>
+                <ColumnListItem>
+                    <cells>
+                        <Text text="{deliverySet>Deliverydocument}" wrapping="false"/>
+                        <Text text="{deliverySet>Customername}" wrapping="false"/>
+                        <Text text="{deliverySet>Cityname}, {deliverySet>Country}" wrapping="false"/>
+                        <Text text="{path: 'deliverySet>Documentdate', formatter: '.formatter.formatDate'}" wrapping="false"/>
+                    </cells>
+                </ColumnListItem>
+            </items>
+        </Table>
+
+        <endButton>
+            <Button
+                text="{i18n>Close}"
+                press=".onClose"
+                type="Emphasized"
+            />
+        </endButton>
+
+    </Dialog>
+</core:FragmentDefinition>

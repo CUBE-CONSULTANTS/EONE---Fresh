@@ -3,8 +3,24 @@ sap.ui.define(
     "sap/ui/core/mvc/Controller",
     "sap/ui/core/UIComponent",
     "sap/ui/core/routing/History",
+    "sap/ui/core/Fragment",
+    "sap/ui/model/json/JSONModel",
+    "sap/m/MessageBox",
+    "sap/m/MessageToast",
+    "../model/API",
+    "../model/formatter",
   ],
-  function (Controller, UIComponent, History) {
+  function (
+    Controller,
+    UIComponent,
+    History,
+    Fragment,
+    JSONModel,
+    MessageBox,
+    MessageToast,
+    API,
+    formatter
+  ) {
     "use strict";
 
     return Controller.extend("rheinmetall.wms.controller.BaseController", {

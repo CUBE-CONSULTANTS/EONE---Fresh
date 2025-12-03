@@ -113,7 +113,7 @@ sap.ui.define(
         });
       },
       _processDelivery: function (sCode) {
-        ;
+        debugger
         const oScanModel = this.getView().getModel("scanModel");
 
         return this._checkDeliveryExists(sCode)
@@ -144,7 +144,6 @@ sap.ui.define(
           });
       },
       _checkDeliveryExists: function (sDeliveryCode) {
-        ;
         return API.readByKey(
           this.getOwnerComponent().getModel("ZCMRTODDT_SRV"),
           "/ZV_DDTSet",

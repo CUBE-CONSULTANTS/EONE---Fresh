@@ -37,8 +37,7 @@
                             />
                             
                     </VBox>
-                </VBox>
-                <f:Card class="sapUiMediumMarginTop"
+                </VBox>Tiny          <f:Card class="sapUiMediumMarginTop"
                     visible="true"
                     headerPosition="Top">
                     <f:header>
@@ -150,7 +149,7 @@
                             iconSrc="sap-icon://shipping-status"
                             title="{i18n>consegna}: {scanModel>/form/ddt}"
                             iconBackgroundColor="Accent6"
-                            statusText="{i18n>data}: {scanModel>/form/date}"
+                            
                         />
                     </f:header>
                     <f:content>
@@ -162,11 +161,19 @@
                         >
                             <Label
                                 design="Bold"
+                                text="{i18n>data}:"
+                            />
+                            <Text
+                                text="{path: 'scanModel>/form/date', formatter: '.formatter.formatDate'}"
+                                class="sapUiTinyMarginBottom"
+                            />
+                            <Label
+                                design="Bold"
                                 text="{i18n>cliente}:"
                             />
                             <Text
                                 text="{scanModel>/form/customer}"
-                                class="sapUiSmallMarginBottom"
+                                class="sapUiTinyMarginBottom"
                             />
 
                             <Label
@@ -175,14 +182,14 @@
                             />
                             <Text
                                 text="{scanModel>/form/destination}"
-                                class="sapUiSmallMarginBottom"
+                                class="sapUiTinyMarginBottom"
                             />
 
                             <Image
                                 src="{scanModel>/form/foto/src}"
                                 width="100%"
                                 height="auto"
-                                class="sapUiMediumMarginBottom"
+                                class="sapUiSmallMarginBottom"
                             >
                                 <detailBox>
                                     <LightBox>

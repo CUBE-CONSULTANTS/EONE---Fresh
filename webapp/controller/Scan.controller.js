@@ -33,7 +33,7 @@ sap.ui.define(
 
       async _onObjectMatched(oEvent) {},
       onBarcodeInputChange: function (e) {
-        debugger;
+        
         const sCode = e.getParameter("value") || "";
         const oScanModel = this.getView().getModel("scanModel");
         oScanModel.setProperty("/code", sCode);
@@ -58,7 +58,7 @@ sap.ui.define(
         const oScanModel = this.getView().getModel("scanModel");
         try {
           const oDelivery = await this._checkDeliveryExists(sCode);
-          debugger;
+          
           if (!oDelivery) {
             throw new Error("Consegna inesistente");
           }
@@ -86,7 +86,7 @@ sap.ui.define(
         }
       },
       _checkDeliveryExists: function (sDeliveryCode) {
-        debugger;
+        
         const oModel = this.getOwnerComponent().getModel("ZCMRTODDT_SRV");
 
         return API.readByKey(
@@ -126,7 +126,7 @@ sap.ui.define(
             name: "",
           };
         }
-        debugger
+        
         const oAttachment = validAttachments[0]; 
         const oModel = this.getOwnerComponent().getModel("ZCMRTODDT_SRV");
         const oFoto = await API.readAttachment(

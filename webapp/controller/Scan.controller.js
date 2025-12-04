@@ -170,8 +170,8 @@ sap.ui.define(
           undefined, 
           "Inquadra il barcode", 
           false, 
-          1, 
-          1, 
+          undefined, 
+          undefined, 
           false, 
           false         
         );

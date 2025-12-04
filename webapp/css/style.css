@@ -2,3 +2,14 @@
 .prova{
   background-color: red!important;
 }
+
+#container-webapp---Scan--barcodeScannerInput-vhi {
+    font-size: 2.5rem !important;       
+    color: white !important;
+    background-color: #0a6ed1 !important; 
+    width: 3rem;
+    height: 3rem;
+    cursor: pointer;
+}
+
+

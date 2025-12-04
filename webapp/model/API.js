@@ -165,39 +165,57 @@ sap.ui.define(
           });
         });
       },
-      readAttachment: async function (oModel, sMandt, sDelivery, sFilename) {
-        const safeFilename = sFilename.split(/[/\\]/).pop();
-        const sUrl = `${oModel.sServiceUrl}/ZAttach_DDTSet(Mandt='${sMandt}',Delivery='${sDelivery}',Filename='${safeFilename}')/$value`;
+      readAttachment: function (oModel, sMandt, sDelivery, sFilename) {
+        return new Promise((resolve, reject) => {
+          const safeFilename = sFilename.split(/[/\\]/).pop();
+          const mandtValue = "";
+          const sPath = `/ZAttach_DDTSet(Mandt='${encodeURIComponent(
+            mandtValue
+          )}',Delivery='${encodeURIComponent(
+            sDelivery
+          )}',Filename='${encodeURIComponent(safeFilename)}')/$value`;
 
-        try {
-          const response = await fetch(sUrl, {
-            method: "GET",
-            headers: { Accept: "*/*" },
+          console.log("DEBUG - Attachment path:", sPath);
+          oModel.read(sPath, {
+            success: function (oData, oResponse) {
+              try {
+                const blob = new Blob([oResponse.responseText], {
+                  type:
+                    oResponse.headers["content-type"] ||
+                    "application/octet-stream",
+                });
+                const mimetype =
+                  oResponse.headers["content-type"] ||
+                  "application/octet-stream";
+
+                const reader = new FileReader();
+                reader.onloadend = function () {
+                  resolve({
+                    src: reader.result,
+                    name: safeFilename,
+                    mimetype: mimetype,
+                    size: blob.size,
+                    last_upload: new Date().toISOString(),
+                  });
+                };
+                reader.onerror = reject;
+                reader.readAsDataURL(blob);
+              } catch (err) {
+                reject(
+                  new Error(`Errore elaborazione allegato: ${err.message}`)
+                );
+              }
+            },
+            error: function (oError) {
+              console.error("DEBUG - ODataModel error:", oError);
+              const errorMsg =
+                oError.responseText || oError.message || "Errore sconosciuto";
+              reject(
+                new Error(`HTTP ${oError.statusCode || "unknown"}: ${errorMsg}`)
+              );
+            },
           });
-
-          if (!response.ok) {
-            throw new Error(`Errore download allegato: ${response.status}`);
-          }
-
-          const blob = await response.blob();
-          const base64 = await new Promise((resolve, reject) => {
-            const reader = new FileReader();
-            reader.onloadend = () => resolve(reader.result);
-            reader.onerror = reject;
-            reader.readAsDataURL(blob);
-          });
-
-          return {
-            src: base64, 
-            name: safeFilename,
-            last_upload: "",
-          };
-        } catch (err) {
-          console.error("Errore caricamento allegato:", err);
-          throw new Error(
-            `Errore caricamento allegato ${safeFilename}: ${err.message}`
-          );
-        }
+        });
       },
 
       sendBatchRequest: function (oModel, batchOperations) {

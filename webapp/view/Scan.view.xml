@@ -119,24 +119,13 @@
                         valueHelpIconSrc="sap-icon://bar-code"
                         showValueHelp="true"
                         placeholder="{i18n>insertDeliveryNumber}"
-                        width="100%"
+                        width="20rem"
                     >
                         <layoutData>
-                            <layout:GridData span="L10 M9 S12" />
+                            <layout:GridData span="L12 M12 S12" />
                         </layoutData>
                     </Input>
 
-                    <Button
-                        icon="sap-icon://search"
-                        press=".onManualSearch"
-                        width="100%"
-                        type="Emphasized"
-                        tooltip="{i18n>search}"
-                    >
-                        <layoutData>
-                            <layout:GridData span="L2 M3 S12" />
-                        </layoutData>
-                    </Button>
                 </layout:Grid>
 
                 <!-- Card con dati consegna -->

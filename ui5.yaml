@@ -4,27 +4,51 @@ metadata:
 type: application
 server:
   customMiddleware:
-    - name: fiori-tools-proxy
+    # - name: ui5-middleware-route-proxy
+    #   afterMiddleware: compression 
+    #   configuration:
+    #     debug: true 
+    #     /sap/opu/odata/sap/zcmrtoddt_srv: 
+    #       target: https://sap.freshtropical.it
+    #       auth:  
+    #         user: consuleone 
+    #         pass: Thebest01! 
+    #         client: '555'
+    #     /resources:
+    #         target: https://ui5.sap.com  
+    - name: ui5-middleware-simpleproxy
       afterMiddleware: compression
+      mountPath: /sap/opu/odata/sap/zcmrtoddt_srv
       configuration:
-        ignoreCertError: false
-        backend:
-          - path: /sap/opu/odata/sap/zcmrtoddt_srv
-            url: https://sap.freshtropical.it
-        ui5:
-          path:
-            - /resources
-            - /test-resources
-          url: https://ui5.sap.com
+        debug: true
+        baseUri: "https://sap.freshtropical.it/sap/opu/odata/sap/zcmrtoddt_srv"
+        username: consuleone
+        password: Thebest01!
+        query:
+          sap-client: '555'
+        excludePatterns:
+        - "/local/**"        
+    # - name: fiori-tools-proxy
+    #   afterMiddleware: compression
+    #   configuration:
+    #     ignoreCertError: false
+        # backend:
+        #   - path: /sap/opu/odata/sap/zcmrtoddt_srv
+        #     url: https://sap.freshtropical.it
+        # ui5:
+        #   path:
+        #     - /resources
+        #     - /test-resources
+        #   url: https://ui5.sap.com
     - name: fiori-tools-appreload
       afterMiddleware: compression
       configuration:
         port: 35729
         path: webapp
         delay: 300
-    - name: preview-middleware
-      afterMiddleware: compression
-      configuration:
-        test:
-          - framework: Qunit
-          - framework: OPA5
+    # - name: preview-middleware
+    #   afterMiddleware: compression
+    #   configuration:
+    #     test:
+    #       - framework: Qunit
+    #       - framework: OPA5

@@ -28,5 +28,9 @@
         "qunit": "fiori run --open test/unitTests.qunit.html",
         "opa5": "fiori run --open test/opaTests.qunit.html",
         "wdi5": "wdio run ./webapp/test/e2e/\\wdio.conf.js"
+    },
+    "dependencies": {
+        "ui5-middleware-route-proxy": "^1.0.10",
+        "ui5-middleware-simpleproxy": "^3.6.0"
     }
 }

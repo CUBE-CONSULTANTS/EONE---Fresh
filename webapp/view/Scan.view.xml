@@ -120,6 +120,7 @@
                         showValueHelp="true"
                         placeholder="{i18n>insertDeliveryNumber}"
                         width="20rem"
+                        
                     >
                         <layoutData>
                             <layout:GridData span="L12 M12 S12" />
@@ -141,16 +142,18 @@
                     </f:header>
                     <f:content>
                         <VBox
-                            width="20rem"
+                            
                             class="sapUiMediumMargin"
                             justifyContent="Start"
                             alignItems="Stretch"
+                            
                         >
                             <Label
                                 design="Bold"
                                 text="{i18n>data}:"
                             />
                             <Text
+                                maxLines="1"
                                 text="{path: 'scanModel>/form/date', formatter: '.formatter.formatDate'}"
                                 class="sapUiTinyMarginBottom"
                             />
@@ -170,6 +173,7 @@
                                 text="{i18n>destinazione}:"
                             />
                             <Text
+                                maxLines="1"
                                 text="{scanModel>/form/destination}"
                                 tooltip="{scanModel>/form/destination}"
                                 wrapping="true"
@@ -178,13 +182,13 @@
                             
                             <Image
                                 src="{scanModel>/form/foto/src}"
-                                width="18rem"
+                               
                                 height="auto"
                                 
                             >
                                 <detailBox>
-                                    <LightBox>
-                                        <LightBoxItem
+                                    <LightBox >
+                                        <LightBoxItem 
                                             imageSrc="{scanModel>/form/foto/src}"
                                             alt="{scanModel>/form/foto/name}"
                                             title="{scanModel>/form/foto/name}"

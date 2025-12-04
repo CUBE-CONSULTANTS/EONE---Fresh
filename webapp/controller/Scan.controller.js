@@ -33,7 +33,7 @@ sap.ui.define(
 
       async _onObjectMatched(oEvent) {},
       onBarcodeInputChange: function (e) {
-        debugger
+        
         const sCode = e.getParameter("value") || "";
         const oScanModel = this.getView().getModel("scanModel");
         oScanModel.setProperty("/code", sCode);
@@ -60,6 +60,7 @@ sap.ui.define(
           const oDelivery = await this._checkDeliveryExists(sCode);
 
           if (!oDelivery) {
+            oScanModel.setProperty("/code", "");
             throw new Error("Consegna inesistente");
           }
           oScanModel.setProperty("/form/ddt", oDelivery.Deliverydocument);
@@ -155,7 +156,7 @@ sap.ui.define(
               oInput.focus();
               return;
             }
-            debugger
+            
             oModel.setProperty("/code", barcode);
             oInput.fireChange({value: barcode});
             BarcodeScanner.closeScanDialog();

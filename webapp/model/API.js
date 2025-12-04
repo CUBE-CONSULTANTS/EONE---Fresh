@@ -211,7 +211,7 @@ sap.ui.define(
               const errorMsg =
                 oError.responseText || oError.message || "Errore sconosciuto";
               reject(
-                new Error(`HTTP ${oError.statusCode || "unknown"}: ${errorMsg}`)
+                new Error(`Errore durante il caricamento dell'allegato`)
               );
             },
           });

@@ -44,15 +44,14 @@ sap.ui.define(
         oInput.setEditable(false);
         this._processDelivery(sCode)
           .catch((err) => {
+            oScanModel.setProperty("/code", "");
             console.error("Errore nel processo consegna:", err);
-
             sap.m.MessageToast.show(
               err.message || "Errore durante la verifica della consegna"
             );
           })
           .finally(() => {
             oInput.setEditable(true);
-            oScanModel.setProperty("/code", "");
           });
       },
       _processDelivery: async function (sCode) {
@@ -77,8 +76,8 @@ sap.ui.define(
             .join(", ");
 
           oScanModel.setProperty("/form/destination", sDestination);
-          // const oFoto = await this._loadDeliveryPhoto(oDelivery);
-          // oScanModel.setProperty("/form/foto", oFoto);
+          const oFoto = await this._loadDeliveryPhoto(oDelivery);
+          oScanModel.setProperty("/form/foto", oFoto);
         } catch (err) {
           console.error(err);
           MessageBox.error(
@@ -115,11 +114,20 @@ sap.ui.define(
           };
         }
 
-        const oAttachment = oDelivery.NavToDdt.results[2];
-        if (!oAttachment) {
-          throw new Error("Errore durante il caricamento della foto");
-        }
+        const validAttachments = oDelivery.NavToDdt.results.filter(
+          (item) =>
+            item.Delivery === oDelivery.Deliverydocument && item.Filename
+        );
 
+        if (validAttachments.length === 0) {
+          return {
+            src: "./public/img/notFound.png",
+            last_upload: "",
+            name: "",
+          };
+        }
+        debugger
+        const oAttachment = validAttachments[0]; 
         const oModel = this.getOwnerComponent().getModel("ZCMRTODDT_SRV");
         const oFoto = await API.readAttachment(
           oModel,

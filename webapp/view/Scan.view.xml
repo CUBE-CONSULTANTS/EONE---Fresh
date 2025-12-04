@@ -125,12 +125,11 @@
                             <layout:GridData span="L12 M12 S12" />
                         </layoutData>
                     </Input>
-
                 </layout:Grid>
 
                 <!-- Card con dati consegna -->
                 <f:Card
-                    class="sapUiMediumMarginTop"
+                    class="sapUiSmallMarginTop"
                     headerPosition="Top"
                 >
                     <f:header>
@@ -138,13 +137,11 @@
                             iconSrc="sap-icon://shipping-status"
                             title="{i18n>consegna}: {scanModel>/form/ddt}"
                             iconBackgroundColor="Accent6"
-                            
                         />
                     </f:header>
                     <f:content>
                         <VBox
                             width="20rem"
-                            height="27rem"
                             class="sapUiMediumMargin"
                             justifyContent="Start"
                             alignItems="Stretch"
@@ -174,16 +171,16 @@
                             />
                             <Text
                                 text="{scanModel>/form/destination}"
-                                tooltip="{scanModel>/form/destination}" 
+                                tooltip="{scanModel>/form/destination}"
                                 wrapping="true"
                                 class="sapUiTinyMarginBottom"
                             />
-
+                            
                             <Image
                                 src="{scanModel>/form/foto/src}"
-                                width="100%"
+                                width="18rem"
                                 height="auto"
-                                class="sapUiSmallMarginBottom"
+                                
                             >
                                 <detailBox>
                                     <LightBox>
@@ -196,6 +193,25 @@
                                     </LightBox>
                                 </detailBox>
                             </Image>
+                         
+                            <!-- <Carousel
+                                id="fotoCarousel"
+                                width="100%"
+                                height="12rem"
+                                class="sapUiSmallMarginBottom"
+                                loop="true"
+                                showPageIndicator="true"
+                                pages="{
+                                    path: 'scanModel>/form/fotoList'
+                                }"
+                            >
+                                <Image
+                                    src="{scanModel>src}"
+                                    width="100%"
+                                    height="auto"
+                                    press="onFotoPress"
+                                />
+                            </Carousel> -->
 
                             <Label
                                 design="Bold"

@@ -129,7 +129,7 @@
 
                 <!-- Card con dati consegna -->
                 <f:Card
-                    class="sapUiTinyMarginTop"
+                    
                     headerPosition="Top"
                     width="21rem"
                 >

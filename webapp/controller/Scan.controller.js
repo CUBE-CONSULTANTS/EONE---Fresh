@@ -118,7 +118,7 @@ sap.ui.define(
           (item) =>
             item.Delivery === oDelivery.Deliverydocument && item.Filename
         );
-
+        
         if (validAttachments.length === 0) {
           return {
             src: "./public/img/notFound.png",
@@ -127,7 +127,7 @@ sap.ui.define(
           };
         }
 
-        const oAttachment = validAttachments[0];
+        const oAttachment = validAttachments[validAttachments.length - 1];
         const oModel = this.getOwnerComponent().getModel("ZCMRTODDT_SRV");
         const oFoto = await API.readAttachment(
           oModel,
@@ -138,7 +138,7 @@ sap.ui.define(
 
         return {
           src: oFoto.src,
-          last_upload: "",
+          last_upload: formatter.formatDate(oFoto.last_upload),
           name: oFoto.name,
         };
       },

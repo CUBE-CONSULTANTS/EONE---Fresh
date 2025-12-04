@@ -167,57 +167,51 @@ sap.ui.define(
       },
       readAttachment: function (oModel, sMandt, sDelivery, sFilename) {
         return new Promise((resolve, reject) => {
-          const safeFilename = sFilename.split(/[/\\]/).pop();
-          const mandtValue = "";
-          const sPath = `/ZAttach_DDTSet(Mandt='${encodeURIComponent(
-            mandtValue
-          )}',Delivery='${encodeURIComponent(
-            sDelivery
-          )}',Filename='${encodeURIComponent(safeFilename)}')/$value`;
+          try {
+            const safeFilename = sFilename.split(/[/\\]/).pop();
+            const mandtValue = sMandt || "";
+            const sUrl =
+              oModel.sServiceUrl +
+              `/ZAttach_DDTSet(Delivery='${encodeURIComponent(
+                sDelivery
+              )}',Filename='${encodeURIComponent(
+                safeFilename
+              )}',Mandt='${encodeURIComponent(mandtValue)}')/$value`;
 
-          console.log("DEBUG - Attachment path:", sPath);
-          oModel.read(sPath, {
-            success: function (oData, oResponse) {
-              try {
-                const blob = new Blob([oResponse.responseText], {
-                  type:
-                    oResponse.headers["content-type"] ||
-                    "application/octet-stream",
-                });
-                const mimetype =
-                  oResponse.headers["content-type"] ||
-                  "application/octet-stream";
+            console.log("DEBUG - Attachment URL:", sUrl);
 
+            $.ajax({
+              url: sUrl,
+              method: "GET",
+              dataType: "binary",
+              xhrFields: {
+                responseType: "blob",
+              },
+              success: function (blob) {
                 const reader = new FileReader();
                 reader.onloadend = function () {
                   resolve({
                     src: reader.result,
                     name: safeFilename,
-                    mimetype: mimetype,
+                    mimetype: blob.type || "application/octet-stream",
                     size: blob.size,
                     last_upload: new Date().toISOString(),
                   });
                 };
                 reader.onerror = reject;
                 reader.readAsDataURL(blob);
-              } catch (err) {
-                reject(
-                  new Error(`Errore elaborazione allegato: ${err.message}`)
-                );
-              }
-            },
-            error: function (oError) {
-              console.error("DEBUG - ODataModel error:", oError);
-              const errorMsg =
-                oError.responseText || oError.message || "Errore sconosciuto";
-              reject(
-                new Error(`Errore durante il caricamento dell'allegato`)
-              );
-            },
-          });
+              },
+              error: function (err) {
+                console.error("DEBUG - Download error:", err);
+                reject(new Error("Errore durante il download dell'allegato"));
+              },
+            });
+          } catch (err) {
+            reject(err);
+          }
         });
       },
-
+      
       sendBatchRequest: function (oModel, batchOperations) {
         return new Promise((resolve, reject) => {
           let mRequests = [];

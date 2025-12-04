@@ -117,6 +117,7 @@
                         change=".onBarcodeInputChange"
                         valueHelpRequest="openScannerForInput('barcodeScannerInputCallback')"
                         valueHelpIconSrc="sap-icon://bar-code"
+                        
                         showValueHelp="true"
                         placeholder="{i18n>insertDeliveryNumber}"
                         width="20rem"

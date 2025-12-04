@@ -33,7 +33,7 @@ sap.ui.define(
 
       async _onObjectMatched(oEvent) {},
       onBarcodeInputChange: function (e) {
-        
+        debugger
         const sCode = e.getParameter("value") || "";
         const oScanModel = this.getView().getModel("scanModel");
         oScanModel.setProperty("/code", sCode);
@@ -58,7 +58,7 @@ sap.ui.define(
         const oScanModel = this.getView().getModel("scanModel");
         try {
           const oDelivery = await this._checkDeliveryExists(sCode);
-          
+
           if (!oDelivery) {
             throw new Error("Consegna inesistente");
           }
@@ -86,7 +86,6 @@ sap.ui.define(
         }
       },
       _checkDeliveryExists: function (sDeliveryCode) {
-        
         const oModel = this.getOwnerComponent().getModel("ZCMRTODDT_SRV");
 
         return API.readByKey(
@@ -126,8 +125,8 @@ sap.ui.define(
             name: "",
           };
         }
-        
-        const oAttachment = validAttachments[0]; 
+
+        const oAttachment = validAttachments[0];
         const oModel = this.getOwnerComponent().getModel("ZCMRTODDT_SRV");
         const oFoto = await API.readAttachment(
           oModel,
@@ -142,25 +141,42 @@ sap.ui.define(
           name: oFoto.name,
         };
       },
-      openScannerForInput() {
+      openScannerForInput: function () {
+        const oInput = this.byId("barcodeScannerInput");
+        const oModel = this.getModel("scanModel");
+
         BarcodeScanner.scan(
           (data) => {
             const barcode = data.text;
-            if (barcode) {
-              this.getModel().setProperty("/code", barcode);
-              this.byId("barcodeScannerInput").fireChange();
-              BarcodeScanner.closeScanDialog();
+            if (!barcode) {
+              sap.m.MessageToast.show(
+                "Scansione annullata o fallita. Inserisci manualmente."
+              );
+              oInput.focus();
+              return;
             }
+            debugger
+            oModel.setProperty("/code", barcode);
+            oInput.fireChange({value: barcode});
+            BarcodeScanner.closeScanDialog();
           },
-          undefined,
-          undefined,
-          undefined,
-          undefined,
-          undefined,
-          1,
-          false
+          (error) => {
+            console.error("Errore durante la scansione:", error);
+            sap.m.MessageToast.show(
+              "Errore nella scansione, inserisci manualmente."
+            );
+            oInput.focus();
+          },
+          undefined, 
+          "Inquadra il barcode", 
+          false, 
+          1, 
+          1, 
+          false, 
+          false         
         );
       },
+      
     });
   }
 );

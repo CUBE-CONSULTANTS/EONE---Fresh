@@ -85,13 +85,10 @@ sap.ui.define(
 
           const oFoto = await this._loadDeliveryPhoto(oDelivery);
           oScanModel.setProperty("/form/foto", oFoto);
-
         } catch (err) {
           console.error(err);
 
-          MessageBox.error(
-            err.message || oBundle.getText("errVerifyDelivery")
-          );
+          MessageBox.error(err.message || oBundle.getText("errVerifyDelivery"));
         }
       },
 
@@ -108,10 +105,7 @@ sap.ui.define(
         )
           .then((oDelivery) => oDelivery || null)
           .catch((err) => {
-            console.warn(
-              oBundle.getText("errOdataFallback"),
-              err
-            );
+            console.warn(oBundle.getText("errOdataFallback"), err);
             return null;
           });
       },
@@ -176,9 +170,7 @@ sap.ui.define(
           (error) => {
             console.error(oBundle.getText("errScan"), error);
 
-            sap.m.MessageToast.show(
-              oBundle.getText("errScanManual")
-            );
+            sap.m.MessageToast.show(oBundle.getText("errScanManual"));
             oInput.focus();
           },
           undefined,
@@ -190,7 +182,47 @@ sap.ui.define(
           false
         );
       },
+      onFileUploaderChange: function (oEvent) {
+        const oFileUploader = oEvent.getSource();
+        const aFiles = oEvent.getParameter("files");
+        const oFile = aFiles[0];
+        const sFileName = oFile.name;
+        const sMimeType = oFile.type || "image/jpeg";
+        const oScanModel = this.getModel("scanModel");
+        const sDelivery = oScanModel.getProperty("/form/ddt");
+        
+        const oReader = new FileReader();
+        oReader.onload = function (e) {
+          const vContent = e.target.result; 
+          const oModel = this.getOwnerComponent().getModel("ZCMRTODDT_SRV");
 
+          const oEntity = {
+            Delivery: sDelivery,
+            Filename: sFileName,
+            Mandt: "", 
+          };
+          const headers = {
+            "Content-Type": sMimeType,
+            Slug: sFileName,
+          };
+          
+          // API.createEntity(oModel, "/AttachDDTSet", vContent, headers)
+          //   .then(() => {
+          //     sap.m.MessageToast.show("Upload completato!");
+          //     oScanModel.setProperty("/form/foto/name", sFileName);
+          //     oScanModel.setProperty(
+          //       "/form/foto/src",
+          //       URL.createObjectURL(oFile)
+          //     );
+          //   })
+          //   .catch((err) => {
+          //     console.error(err);
+          //     MessageBox.error("Errore durante l'upload.");
+          //   });
+        }.bind(this);
+
+        oReader.readAsArrayBuffer(oFile);
+      },
     });
   }
 );

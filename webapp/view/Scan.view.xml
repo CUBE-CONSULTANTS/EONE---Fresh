@@ -225,6 +225,7 @@
                                 value="{scanModel>/form/foto/name}"
                                 buttonText="{i18n>sostituisci}"
                                 style="Emphasized"
+                                change="onFileUploaderChange"
                             />
                         </VBox>
                     </f:content>

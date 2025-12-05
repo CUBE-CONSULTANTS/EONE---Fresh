@@ -203,7 +203,7 @@ sap.ui.define(
               },
               error: function (err) {
                 console.error("DEBUG - Download error:", err);
-                reject(new Error("Errore durante il download dell'allegato"));
+                reject(new Error("Errore durante il recupero dell'allegato"));
               },
             });
           } catch (err) {

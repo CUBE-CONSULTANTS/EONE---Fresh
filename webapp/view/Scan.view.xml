@@ -120,6 +120,7 @@
                         showValueHelp="true"
                         placeholder="{i18n>insertDeliveryNumber}"
                         width="20rem"
+                        
                     >
                         <layoutData>
                             <layout:GridData span="L12 M12 S12" />

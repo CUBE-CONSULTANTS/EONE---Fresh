@@ -8,9 +8,6 @@ sap.ui.define(
     "sap/ui/model/json/JSONModel",
     "../model/formatter",
   ],
-  /**
-   * @param {typeof sap.ui.core.mvc.Controller} Controller
-   */
   function (
     BaseController,
     models,
@@ -24,6 +21,7 @@ sap.ui.define(
 
     return BaseController.extend("webapp.controller.Scan", {
       formatter: formatter,
+
       onInit: function () {
         this.getRouter()
           .getRoute("Scan")
@@ -32,37 +30,44 @@ sap.ui.define(
       },
 
       async _onObjectMatched(oEvent) {},
+
       onBarcodeInputChange: function (e) {
-        
+        const oBundle = this.getResourceBundle();
         const sCode = e.getParameter("value") || "";
         const oScanModel = this.getView().getModel("scanModel");
         oScanModel.setProperty("/code", sCode);
-        if (!sCode) {
-          return;
-        }
+
+        if (!sCode) return;
+
         const oInput = e.getSource();
         oInput.setEditable(false);
+
         this._processDelivery(sCode)
           .catch((err) => {
             oScanModel.setProperty("/code", "");
-            console.error("Errore nel processo consegna:", err);
+            console.error(oBundle.getText("errProcessDelivery"), err);
+
             sap.m.MessageToast.show(
-              err.message || "Errore durante la verifica della consegna"
+              err.message || oBundle.getText("errVerifyDelivery")
             );
           })
           .finally(() => {
             oInput.setEditable(true);
           });
       },
+
       _processDelivery: async function (sCode) {
+        const oBundle = this.getResourceBundle();
         const oScanModel = this.getView().getModel("scanModel");
+
         try {
           const oDelivery = await this._checkDeliveryExists(sCode);
 
           if (!oDelivery) {
             oScanModel.setProperty("/code", "");
-            throw new Error("Consegna inesistente");
+            throw new Error(oBundle.getText("errDeliveryNotFound"));
           }
+
           oScanModel.setProperty("/form/ddt", oDelivery.Deliverydocument);
           oScanModel.setProperty("/form/date", oDelivery.Documentdate);
           oScanModel.setProperty("/form/customer", oDelivery.Customername);
@@ -77,16 +82,21 @@ sap.ui.define(
             .join(", ");
 
           oScanModel.setProperty("/form/destination", sDestination);
+
           const oFoto = await this._loadDeliveryPhoto(oDelivery);
           oScanModel.setProperty("/form/foto", oFoto);
+
         } catch (err) {
           console.error(err);
+
           MessageBox.error(
-            err.message || "Errore durante la verifica della consegna"
+            err.message || oBundle.getText("errVerifyDelivery")
           );
         }
       },
+
       _checkDeliveryExists: function (sDeliveryCode) {
+        const oBundle = this.getResourceBundle();
         const oModel = this.getOwnerComponent().getModel("ZCMRTODDT_SRV");
 
         return API.readByKey(
@@ -99,12 +109,13 @@ sap.ui.define(
           .then((oDelivery) => oDelivery || null)
           .catch((err) => {
             console.warn(
-              "Errore OData (interpreto come consegna inesistente):",
+              oBundle.getText("errOdataFallback"),
               err
             );
             return null;
           });
       },
+
       _loadDeliveryPhoto: async function (oDelivery) {
         if (!oDelivery.NavToDdt || oDelivery.NavToDdt.results.length === 0) {
           return {
@@ -118,7 +129,7 @@ sap.ui.define(
           (item) =>
             item.Delivery === oDelivery.Deliverydocument && item.Filename
         );
-        
+
         if (validAttachments.length === 0) {
           return {
             src: "./public/img/notFound.png",
@@ -142,42 +153,44 @@ sap.ui.define(
           name: oFoto.name,
         };
       },
+
       openScannerForInput: function () {
+        const oBundle = this.getResourceBundle();
         const oInput = this.byId("barcodeScannerInput");
         const oModel = this.getModel("scanModel");
 
         BarcodeScanner.scan(
           (data) => {
             const barcode = data.text;
+
             if (!barcode) {
-              sap.m.MessageToast.show(
-                "Scansione annullata o fallita. Inserisci manualmente."
-              );
+              sap.m.MessageToast.show(oBundle.getText("scanCancelled"));
               oInput.focus();
               return;
             }
-            
+
             oModel.setProperty("/code", barcode);
-            oInput.fireChange({value: barcode});
+            oInput.fireChange({ value: barcode });
             BarcodeScanner.closeScanDialog();
           },
           (error) => {
-            console.error("Errore durante la scansione:", error);
+            console.error(oBundle.getText("errScan"), error);
+
             sap.m.MessageToast.show(
-              "Errore nella scansione, inserisci manualmente."
+              oBundle.getText("errScanManual")
             );
             oInput.focus();
           },
-          undefined, 
-          "Inquadra il barcode", 
-          false, 
-          undefined, 
-          undefined, 
-          false, 
-          false         
+          undefined,
+          oBundle.getText("scanDialogTitle"),
+          false,
+          undefined,
+          undefined,
+          false,
+          false
         );
       },
-      
+
     });
   }
 );

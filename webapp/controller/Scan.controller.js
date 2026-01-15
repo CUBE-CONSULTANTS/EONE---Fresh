@@ -73,7 +73,17 @@ sap.ui.define(
           const oDelivery = await this._checkDeliveryExists(sCode);
 
           if (!oDelivery) {
+            
             oScanModel.setProperty("/code", "");
+            oScanModel.setProperty("/form/ddt","")
+            oScanModel.setProperty("/form/date","")
+            oScanModel.setProperty("/form/customer","")
+            oScanModel.setProperty("/form/destination","")
+            oScanModel.setProperty("/form/foto", {
+                src: "./public/img/notFound.png",
+                last_upload: "",
+                name: ""
+            });
             throw new Error(oBundle.getText("errDeliveryNotFound"));
           }
 

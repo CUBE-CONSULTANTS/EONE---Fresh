@@ -185,10 +185,12 @@
                                 width="100%"
                                 height="auto"
                                 class="sapUiSmallMarginBottom"
+                                
                             >
                                 <detailBox>
                                     <LightBox>
                                         <LightBoxItem
+                                            
                                             imageSrc="{scanModel>/form/foto/src}"
                                             alt="{scanModel>/form/foto/name}"
                                             title="{scanModel>/form/foto/name}"

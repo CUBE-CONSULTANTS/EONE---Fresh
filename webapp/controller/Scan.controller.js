@@ -29,7 +29,16 @@ sap.ui.define(
         this.setModel(models.createScanModel(), "scanModel");
       },
 
-      async _onObjectMatched(oEvent) {},
+      async _onObjectMatched(oEvent) {
+        //TEST DELIVERY: FOTO ESISTENTE = 180000003, CONSEGNA NON ESISTENTE = 180000004
+        //CONSEGNA ESISTENTE SENZA FOTO, POCHI DATI 180000002
+        // try {
+        //   const dataTest = await API.getEntity(this.getOwnerComponent().getModel("ZCMRTODDT_SRV"),"/ZV_DDTSet")
+        //   console.log(dataTest)
+        // } catch (error) {
+        //   console.log(error)
+        // }
+      },
 
       onBarcodeInputChange: function (e) {
         const oBundle = this.getResourceBundle();
@@ -59,7 +68,7 @@ sap.ui.define(
       _processDelivery: async function (sCode) {
         const oBundle = this.getResourceBundle();
         const oScanModel = this.getView().getModel("scanModel");
-
+        this.showBusy(0);
         try {
           const oDelivery = await this._checkDeliveryExists(sCode);
 
@@ -87,8 +96,9 @@ sap.ui.define(
           oScanModel.setProperty("/form/foto", oFoto);
         } catch (err) {
           console.error(err);
-
           MessageBox.error(err.message || oBundle.getText("errVerifyDelivery"));
+        } finally {
+          this.hideBusy(0);
         }
       },
 
@@ -169,7 +179,6 @@ sap.ui.define(
           },
           (error) => {
             console.error(oBundle.getText("errScan"), error);
-
             sap.m.MessageToast.show(oBundle.getText("errScanManual"));
             oInput.focus();
           },
@@ -182,6 +191,7 @@ sap.ui.define(
           false
         );
       },
+
       onFileUploaderChange: function (oEvent) {
         const oFileUploader = oEvent.getSource();
         const aFiles = oEvent.getParameter("files");
@@ -190,22 +200,24 @@ sap.ui.define(
         const sMimeType = oFile.type || "image/jpeg";
         const oScanModel = this.getModel("scanModel");
         const sDelivery = oScanModel.getProperty("/form/ddt");
-        
+
+        // this.showBusy(0)
+
         const oReader = new FileReader();
         oReader.onload = function (e) {
-          const vContent = e.target.result; 
+          const vContent = e.target.result;
           const oModel = this.getOwnerComponent().getModel("ZCMRTODDT_SRV");
 
           const oEntity = {
             Delivery: sDelivery,
             Filename: sFileName,
-            Mandt: "", 
+            Mandt: "",
           };
           const headers = {
             "Content-Type": sMimeType,
             Slug: sFileName,
           };
-          
+
           // API.createEntity(oModel, "/AttachDDTSet", vContent, headers)
           //   .then(() => {
           //     sap.m.MessageToast.show("Upload completato!");
@@ -218,6 +230,8 @@ sap.ui.define(
           //   .catch((err) => {
           //     console.error(err);
           //     MessageBox.error("Errore durante l'upload.");
+          //   }).finally(() => {
+          //     this.hideBusy(0);
           //   });
         }.bind(this);
 
